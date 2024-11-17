@@ -65,7 +65,7 @@ public class Cliente {
     }
 
     // Método para obtener un cliente por su ID
-    private Cliente obtenerClientePorId(List<Cliente> clientes, int id) {
+    public Cliente obtenerClientePorId(List<Cliente> clientes, int id) {
         for (Cliente cliente : clientes) {
             if (cliente.getId() == id) {
                 return cliente;

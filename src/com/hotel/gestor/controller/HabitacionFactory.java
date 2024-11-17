@@ -18,7 +18,7 @@ public class HabitacionFactory {
             double precio = tipo.equals("Suite") ? 300 : (tipo.equals("Doble") ? 150 : 80);
 
             // Crear una nueva habitación con el id generado por el contador
-            Habitacion habitacion = new Habitacion(contadorId++, i, tipo, capacidad, precio, "disponible");
+            Habitacion habitacion = new Habitacion(contadorId++, i, tipo, capacidad, precio, false);
 
             habitaciones.add(habitacion);
         }

@@ -109,7 +109,7 @@ public class Reserva {
         }
 
         // Crear objetos relacionados
-        Habitacion habitacion = new Habitacion(habitacionId, 0,"N/A", 0, 0, "N/A"); // Placeholder
+        Habitacion habitacion = new Habitacion(habitacionId, 0,"N/A", 0, 0, false); // Placeholder
         Cliente cliente = new Cliente(clienteId, "N/A", "N/A", "N/A"); // Placeholder
 
         return new Reserva(id, habitacion, cliente, fechaReserva, fechaCheckIn, fechaCheckOut);

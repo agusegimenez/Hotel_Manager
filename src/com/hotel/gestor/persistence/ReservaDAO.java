@@ -44,8 +44,8 @@ public class ReservaDAO {
                             Date fechaCheckOut = fechaFormat.parse(datos[5].trim());  // El sexto valor es la fecha de check-out
 
                             // Buscar la habitacion y el cliente correspondientes a sus IDs
-                            Habitacion habitacion = habitacion.obtenerHabitacionPorId(habitaciones, idHabitacion);
-                            Cliente cliente = cliente.obtenerClientePorId(clientes, idCliente);
+                            Habitacion habitacion = obtenerHabitacionPorId(habitaciones, idHabitacion);
+                            Cliente cliente = obtenerClientePorId(clientes, idCliente);
 
                             // Verificamos que los objetos habitacion y cliente sean válidos
                             if (habitacion != null && cliente != null) {
@@ -75,8 +75,10 @@ public class ReservaDAO {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARCHIVO_RESERVAS))) {
             for (Reserva reserva : reservas) {
                 // Guardamos los datos de la reserva en formato CSV (idCliente, idHabitacion, fechaReserva)
-                writer.write(reserva.getCliente().getId() + "," + reserva.getHabitacion().getId() + "," + reserva.getFechaReserva());
-                writer.newLine();
+                writer.write(reserva.getId() + "," + reserva.getHabitacion().getId() + "," + reserva.getCliente().getId() + "," +
+                        fechaFormat.format(reserva.getFechaReserva()) + "," +
+                        fechaFormat.format(reserva.getFechaCheckIn()) + "," +
+                        fechaFormat.format(reserva.getFechaCheckOut()));
             }
         } catch (IOException e) {
             e.printStackTrace();  // Manejo básico de errores

@@ -8,16 +8,16 @@ public class Habitacion {
     private String tipo; // Ejemplo: "Simple", "Doble", "Suite"
     private int capacidad;
     private double precio;
-    private String estado; // "disponible" o "ocupada"
+    private boolean estaReservada; // "disponible" o "ocupada"
     private Cliente cliente;  // Cliente asociado si está ocupada
 
-    public Habitacion(int id, int numero, String tipo, int capacidad, double precio, String estado) {
+    public Habitacion(int id, int numero, String tipo, int capacidad, double precio, boolean estaReservada) {
         this.id = id;
         this.numero = numero;
         this.tipo = tipo;
         this.capacidad = capacidad;
         this.precio = precio;
-        this.estado = estado;
+        this.estaReservada = estaReservada;
     }
 
     // Getters y setters
@@ -61,12 +61,12 @@ public class Habitacion {
         this.precio = precio;
     }
 
-    public String getEstado() {
-        return estado;
+    public boolean getDisponibilidad() {
+        return estaReservada;
     }
 
     public void setEstado(String estado) {
-        this.estado = estado;
+        this.estaReservada = estaReservada;
     }
 
     public Cliente getCliente() {
@@ -78,12 +78,16 @@ public class Habitacion {
     }
 
     public void cambiarEstado(String nuevoEstado) {
-        this.estado = nuevoEstado;
+        if(this.estaReservada == false){
+            this.estaReservada = true;
+        } else {
+            this.estaReservada = false;
+        }
     }
 
     @Override
     public String toString() {
-        return "Habitación " + numero + " - " + tipo + " (" + capacidad + " personas) - $" + precio + " - " + estado;
+        return "Habitación " + numero + " - " + tipo + " (" + capacidad + " personas) - $" + precio + " - " + ();
     }
 
     public String toDataString() {
@@ -102,7 +106,7 @@ public class Habitacion {
     }
 
     // Método para obtener una habitación por su ID
-    private Habitacion obtenerHabitacionPorId(List<Habitacion> habitaciones, int id) {
+    public Habitacion obtenerHabitacionPorId(List<Habitacion> habitaciones, int id) {
         for (Habitacion habitacion : habitaciones) {
             if (habitacion.getId() == id) {
                 return habitacion;

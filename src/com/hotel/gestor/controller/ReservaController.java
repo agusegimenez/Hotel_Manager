@@ -20,12 +20,12 @@ public class ReservaController {
     }
 
     // Método para crear una reserva
-    public void crearReserva(int numeroHabitacion, Cliente cliente, Date fechaReserva, String fechaCheckIn, String fechaCheckOut) {
+    public void crearReserva(int idHabitacion, Cliente cliente, Date fechaReserva, Date fechaCheckIn, Date fechaCheckOut) {
         // Buscamos la habitación por el número
-        Habitacion habitacion = habitacionDAO.buscarPorNumero(numeroHabitacion);
+        Habitacion habitacion = habitacionDAO.buscarPorId(idHabitacion);
 
         // Verificamos si la habitación está disponible
-        if (habitacion != null && habitacion.getEstado().equalsIgnoreCase("disponible")) {
+        if (habitacion != null && habitacion.getDisponibilidad() == true) {
             // Creamos la nueva reserva
             Reserva reserva = new Reserva(
                     reservaDAO.generarId(),  // Generamos un ID único para la reserva
