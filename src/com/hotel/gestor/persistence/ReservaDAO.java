@@ -11,45 +11,33 @@ import java.util.List;
 
 public class ReservaDAO {
 
-    private static final String ARCHIVO_RESERVAS = "reservas.txt";  // Nombre del archivo donde se guardarán las reservas.
+    private static final String ARCHIVO_RESERVAS = "reservas.txt";
+    private static final SimpleDateFormat fechaFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     // Método para cargar las reservas desde el archivo
-    private static final SimpleDateFormat fechaFormat = new SimpleDateFormat("yyyy-MM-dd");  // Formato de fecha que se utilizará.
-
-    // Método para cargar las reservas desde el archivo
-    public List<Reserva> cargarReservas(List<Habitacion> habitaciones, List<Cliente> clientes) {
+    public List<Reserva> cargarReservas() {
         List<Reserva> reservas = new ArrayList<>();
-        File archivo = new File(ARCHIVO_RESERVAS);  // Se obtiene el archivo donde están las reservas.
+        File archivo = new File(ARCHIVO_RESERVAS);
 
-        // Verificamos si el archivo existe
         if (archivo.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {  // Usamos BufferedReader para leer el archivo línea por línea.
+            try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
                 String linea;
-                while ((linea = reader.readLine()) != null) {  // Leemos cada línea del archivo.
-                    // Suponemos que cada línea tiene el formato: idReserva, idHabitacion, idCliente, fechaReserva, fechaCheckIn, fechaCheckOut
-                    String[] datos = linea.split(",");  // Separamos la línea por comas, asumiendo que el archivo está en formato CSV.
+                while ((linea = reader.readLine()) != null) {
+                    String[] datos = linea.split(",");
 
-                    // Verificamos que la línea tenga 6 valores
                     if (datos.length == 6) {
                         try {
-                            int id = Integer.parseInt(datos[0].trim());  // El primer valor es el ID de la reserva
-                            int idHabitacion = Integer.parseInt(datos[1].trim());  // El segundo valor es el ID de la habitación
-                            int idCliente = Integer.parseInt(datos[2].trim());  // El tercer valor es el ID del cliente
+                            int id = Integer.parseInt(datos[0].trim());
+                            int idHabitacion = Integer.parseInt(datos[1].trim());
+                            int idCliente = Integer.parseInt(datos[2].trim());
+                            Date fechaReserva = fechaFormat.parse(datos[3].trim());
+                            Date fechaCheckIn = fechaFormat.parse(datos[4].trim());
+                            Date fechaCheckOut = fechaFormat.parse(datos[5].trim());
 
-                            // Convertimos el String de la fecha de reserva a un objeto Date
-                            Date fechaReserva = fechaFormat.parse(datos[3].trim());  // El cuarto valor es la fecha de la reserva
+                            Habitacion habitacion = obtenerHabitacionPorId(idHabitacion);
+                            Cliente cliente = obtenerClientePorId(idCliente);
 
-                            // Los valores de check-in y check-out también se convierten a Date
-                            Date fechaCheckIn = fechaFormat.parse(datos[4].trim());  // El quinto valor es la fecha de check-in
-                            Date fechaCheckOut = fechaFormat.parse(datos[5].trim());  // El sexto valor es la fecha de check-out
-
-                            // Buscar la habitacion y el cliente correspondientes a sus IDs
-                            Habitacion habitacion = obtenerHabitacionPorId(habitaciones, idHabitacion);
-                            Cliente cliente = obtenerClientePorId(clientes, idCliente);
-
-                            // Verificamos que los objetos habitacion y cliente sean válidos
                             if (habitacion != null && cliente != null) {
-                                // Creamos una nueva reserva con los datos leídos
                                 reservas.add(new Reserva(id, habitacion, cliente, fechaReserva, fechaCheckIn, fechaCheckOut));
                             } else {
                                 System.out.println("No se encontró la habitación o cliente con los ID: " + idHabitacion + ", " + idCliente);
@@ -58,30 +46,31 @@ public class ReservaDAO {
                             System.out.println("Error al convertir los datos: " + e.getMessage());
                         }
                     } else {
-                        System.out.println("Línea no válida: " + linea);  // Si la línea no tiene 6 valores, la ignoramos o podemos manejarla.
+                        System.out.println("Línea no válida: " + linea);
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();  // Manejo básico de errores al leer el archivo.
+                e.printStackTrace();
             }
         }
 
-        return reservas;  // Devolvemos la lista de reservas cargadas.
+        return reservas;
     }
-
 
     // Método para guardar las reservas en el archivo
     public void guardarReservas(List<Reserva> reservas) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARCHIVO_RESERVAS))) {
             for (Reserva reserva : reservas) {
-                // Guardamos los datos de la reserva en formato CSV (idCliente, idHabitacion, fechaReserva)
-                writer.write(reserva.getId() + "," + reserva.getHabitacion().getId() + "," + reserva.getCliente().getId() + "," +
+                writer.write(reserva.getId() + "," +
+                        reserva.getHabitacion().getId() + "," +
+                        reserva.getCliente().getId() + "," +
                         fechaFormat.format(reserva.getFechaReserva()) + "," +
                         fechaFormat.format(reserva.getFechaCheckIn()) + "," +
                         fechaFormat.format(reserva.getFechaCheckOut()));
+                writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();  // Manejo básico de errores
+            e.printStackTrace();
         }
     }
 
@@ -96,23 +85,67 @@ public class ReservaDAO {
     public boolean verificarReserva(int idHabitacion) {
         List<Reserva> reservas = cargarReservas();
         for (Reserva reserva : reservas) {
-            if (reserva.getId() == idHabitacion) {
-                return true;  // Si ya existe una reserva para esta habitación, retornamos true
+            if (reserva.getHabitacion().getId() == idHabitacion) {
+                return true;
             }
         }
-        return false;  // Si no se encuentra ninguna reserva, retornamos false
+        return false;
+    }
+
+    // Método para obtener una habitación por ID
+    private Habitacion obtenerHabitacionPorId(int idHabitacion) {
+        HabitacionDAO habitacionDAO = new HabitacionDAO();
+        List<Habitacion> habitaciones = habitacionDAO.cargarHabitaciones();
+
+        for (Habitacion habitacion : habitaciones) {
+            if (habitacion.getId() == idHabitacion) {
+                return habitacion;
+            }
+        }
+        return null;
+    }
+
+    // Método para obtener un cliente por ID
+    private Cliente obtenerClientePorId(int idCliente) {
+        ClienteDAO clienteDAO = new ClienteDAO();
+        List<Cliente> clientes = clienteDAO.cargarClientes();
+
+        for (Cliente cliente : clientes) {
+            if (cliente.getId() == idCliente) {
+                return cliente;
+            }
+        }
+        return null;
     }
 
     // Método para generar un ID único para cada nueva reserva
     public int generarId() {
         List<Reserva> reservas = cargarReservas();
-        // Si no hay reservas, el ID será 1, de lo contrario, se incrementa el ID del último registro
         if (reservas.isEmpty()) {
             return 1;
         } else {
-            // Se obtiene el ID de la última reserva y se le suma 1
             return reservas.get(reservas.size() - 1).getId() + 1;
         }
     }
+
+    // Nuevo método: buscar una reserva por ID
+    public Reserva buscarPorId(int idReserva) {
+        List<Reserva> reservas = cargarReservas();
+        for (Reserva reserva : reservas) {
+            if (reserva.getId() == idReserva) {
+                return reserva;
+            }
+        }
+        return null; // Devuelve null si no encuentra la reserva
+    }
+
+    // Nuevo método: eliminar una reserva por ID
+    public void eliminarReserva(int idReserva) {
+        List<Reserva> reservas = cargarReservas();
+        reservas.removeIf(reserva -> reserva.getId() == idReserva); // Eliminamos la reserva con el ID especificado
+        guardarReservas(reservas); // Guardamos la lista actualizada
+    }
 }
+
+
 

@@ -8,8 +8,8 @@ public class Habitacion {
     private String tipo; // Ejemplo: "Simple", "Doble", "Suite"
     private int capacidad;
     private double precio;
-    private boolean estaReservada; // "disponible" o "ocupada"
-    private Cliente cliente;  // Cliente asociado si está ocupada
+    private boolean estaReservada; // true si está ocupada, false si está disponible
+    private Cliente cliente; // Cliente asociado si está ocupada
 
     public Habitacion(int id, int numero, String tipo, int capacidad, double precio, boolean estaReservada) {
         this.id = id;
@@ -61,11 +61,11 @@ public class Habitacion {
         this.precio = precio;
     }
 
-    public boolean getDisponibilidad() {
+    public boolean isEstaReservada() { // Cambio el getter para seguir la convención booleana
         return estaReservada;
     }
 
-    public void setEstado(String estado) {
+    public void setEstaReservada(boolean estaReservada) {
         this.estaReservada = estaReservada;
     }
 
@@ -77,43 +77,69 @@ public class Habitacion {
         this.cliente = cliente;
     }
 
-    public void cambiarEstado(String nuevoEstado) {
-        if(this.estaReservada == false){
-            this.estaReservada = true;
-        } else {
-            this.estaReservada = false;
-        }
+    public void cambiarEstado() { // Cambio para alternar entre reservado y disponible
+        this.estaReservada = !this.estaReservada;
     }
 
     @Override
     public String toString() {
-        return "Habitación " + numero + " - " + tipo + " (" + capacidad + " personas) - $" + precio + " - " + ();
+        String estado = estaReservada ? "Ocupada" : "Disponible";
+        return "Habitación " + numero + " - " + tipo + " (" + capacidad + " personas) - $" + precio + " - " + estado;
     }
 
     public String toDataString() {
-        return id + "," + tipo + "," + capacidad + "," + precio + "," + estado;
+        return id + "," + numero + "," + tipo + "," + capacidad + "," + precio + "," + estaReservada;
     }
 
     public static Habitacion fromDataString(String data) {
         String[] parts = data.split(",");
-        int id = Integer.parseInt(parts[0]);
-        int numero = Integer.parseInt(parts[1]);
-        String tipo = parts[2];
-        int capacidad = Integer.parseInt(parts[3]);
-        double precio = Double.parseDouble(parts[4]);
-        String estado = parts[5];
-        return new Habitacion(id, numero, tipo, capacidad, precio, estado);
+
+        // Verificar que la línea tiene 6 partes (como se espera)
+        if (parts.length != 6) {
+            System.err.println("Línea de datos no válida: " + data);
+            return null;  // Si la línea no tiene el formato adecuado, devolvemos null
+        }
+
+        int id = parseIntSafe(parts[0]);
+        int numero = parseIntSafe(parts[1]);
+        String tipo = parts[2].trim(); // Asegurarse de eliminar espacios innecesarios
+        int capacidad = parseIntSafe(parts[3]);
+        double precio = parseDoubleSafe(parts[4]);
+        boolean estaReservada = Boolean.parseBoolean(parts[5].trim());
+
+        return new Habitacion(id, numero, tipo, capacidad, precio, estaReservada);
     }
 
+
+    // Método seguro para parsear enteros, que devuelve 0 en caso de que haya un error
+    private static int parseIntSafe(String value) {
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return 0;  // Valor por defecto si no se puede parsear
+        }
+    }
+
+    // Método seguro para parsear dobles, que devuelve 0.0 en caso de que haya un error
+    private static double parseDoubleSafe(String value) {
+        try {
+            return Double.parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            return 0.0;  // Valor por defecto si no se puede parsear
+        }
+    }
+
+
     // Método para obtener una habitación por su ID
-    public Habitacion obtenerHabitacionPorId(List<Habitacion> habitaciones, int id) {
+    public static Habitacion obtenerHabitacionPorId(List<Habitacion> habitaciones, int id) {
         for (Habitacion habitacion : habitaciones) {
             if (habitacion.getId() == id) {
                 return habitacion;
             }
         }
-        return null;  // Si no se encuentra la habitación, devolvemos null
+        return null; // Si no se encuentra la habitación, devolvemos null
     }
 }
+
 
 

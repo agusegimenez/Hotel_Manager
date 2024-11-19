@@ -1,5 +1,6 @@
 package com.hotel.gestor.persistence;
 
+import com.hotel.gestor.controller.HabitacionFactory;
 import com.hotel.gestor.model.Cliente;
 import com.hotel.gestor.model.Habitacion;
 import com.hotel.gestor.model.Reserva;
@@ -27,14 +28,35 @@ public class ArchivoManager {
     // Cargar habitaciones desde un archivo
     public static List<Habitacion> cargarHabitaciones() throws IOException {
         List<Habitacion> habitaciones = new ArrayList<>();
+        crearArchivoSiNoExiste(HABITACIONES_FILE);  // Crear archivo si no existe
+
         try (BufferedReader reader = new BufferedReader(new FileReader(HABITACIONES_FILE))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
-                habitaciones.add(Habitacion.fromDataString(linea));
+                // Ignorar líneas vacías
+                if (linea.trim().isEmpty()) {
+                    continue;
+                }
+
+                // Procesar la línea y crear la habitación
+                Habitacion habitacion = Habitacion.fromDataString(linea);
+                if (habitacion == null) {
+                    System.out.println("Línea de datos no válida: " + linea);
+                } else {
+                    habitaciones.add(habitacion);
+                }
+            }
+
+            // Si el archivo está vacío o no tiene datos válidos, generar habitaciones nuevas
+            if (habitaciones.isEmpty()) {
+                HabitacionFactory habitacionFactory = new HabitacionFactory();
+                habitacionFactory.generarHabitaciones();
             }
         }
+
         return habitaciones;
     }
+
 
     // Guardar clientes en un archivo
     public static void guardarClientes(List<Cliente> clientes) throws IOException {
@@ -49,6 +71,7 @@ public class ArchivoManager {
     // Cargar clientes desde un archivo
     public static List<Cliente> cargarClientes() throws IOException {
         List<Cliente> clientes = new ArrayList<>();
+        crearArchivoSiNoExiste(CLIENTES_FILE);  // Crear archivo si no existe
         try (BufferedReader reader = new BufferedReader(new FileReader(CLIENTES_FILE))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
@@ -71,6 +94,7 @@ public class ArchivoManager {
     // Cargar reservas desde un archivo
     public static List<Reserva> cargarReservas() throws IOException {
         List<Reserva> reservas = new ArrayList<>();
+        crearArchivoSiNoExiste(RESERVAS_FILE);  // Crear archivo si no existe
         try (BufferedReader reader = new BufferedReader(new FileReader(RESERVAS_FILE))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
@@ -79,4 +103,36 @@ public class ArchivoManager {
         }
         return reservas;
     }
+
+    // Método para guardar los datos en archivos de texto (.txt)
+    public void guardarDatos(List<Habitacion> habitaciones, List<Cliente> clientes, List<Reserva> reservas) throws IOException {
+        guardarHabitaciones(habitaciones);
+        guardarClientes(clientes);
+        guardarReservas(reservas);
+    }
+
+    // Método para cargar los datos desde archivos de texto (.txt)
+    public void cargarDatos() throws IOException {
+        // Cargar habitaciones
+        cargarHabitaciones();
+
+        // Cargar clientes
+        cargarClientes();
+
+        // Cargar reservas
+        cargarReservas();
+    }
+
+    // Método para crear un archivo si no existe
+    private static void crearArchivoSiNoExiste(String nombreArchivo) {
+        File archivo = new File(nombreArchivo);
+        if (!archivo.exists()) {
+            try {
+                archivo.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
+

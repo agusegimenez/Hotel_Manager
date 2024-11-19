@@ -3,7 +3,8 @@ package com.hotel.gestor.persistence;
 import com.hotel.gestor.model.Habitacion;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HabitacionDAO {
     private static final String ARCHIVO_HABITACIONES = "habitaciones.txt";
@@ -19,8 +20,8 @@ public class HabitacionDAO {
                 String tipo = datos[2];
                 int capacidad = Integer.parseInt(datos[3]);
                 double precio = Double.parseDouble(datos[4]);
-                String estado = datos[5];
-                habitaciones.add(new Habitacion(id, numero, tipo, capacidad, precio, estado));
+                boolean estaReservada = Boolean.parseBoolean(datos[5]); // Convertir el estado a boolean
+                habitaciones.add(new Habitacion(id, numero, tipo, capacidad, precio, estaReservada));
             }
         } catch (IOException e) {
             System.out.println("Error al cargar habitaciones: " + e.getMessage());
@@ -36,7 +37,7 @@ public class HabitacionDAO {
                         habitacion.getTipo() + ";" +
                         habitacion.getCapacidad() + ";" +
                         habitacion.getPrecio() + ";" +
-                        habitacion.getEstado());
+                        habitacion.isEstaReservada());
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -54,3 +55,4 @@ public class HabitacionDAO {
         return null;
     }
 }
+
