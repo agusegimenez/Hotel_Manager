@@ -1,86 +1,62 @@
 package com.hotel.gestor.controller;
 
-import com.hotel.gestor.model.Cliente;
 import com.hotel.gestor.model.Habitacion;
-import com.hotel.gestor.model.Reserva;
 import com.hotel.gestor.persistence.ArchivoManager;
+import com.hotel.gestor.service.HabitacionService;
 import com.hotel.gestor.view.MainView;
-import com.hotel.gestor.view.ReservaView;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainController {
-
     private List<Habitacion> habitaciones;
-    private List<Cliente> clientes;
-    private List<Reserva> reservas;
-    private ArchivoManager archivoManager;
     private MainView mainView;
-    private ReservaView reservaView;
-    private ReservaController reservaController;
-    private HabitacionFactory habitacionFactory;
+    private ArchivoManager archivoManager;
+    private HabitacionService habitacionService;
 
     public MainController() throws IOException {
-        // Inicializamos las listas de habitaciones, clientes y reservas
-        cargarDatos();
-        // Inicializamos ArchivoManager y cargamos los datos desde los archivos
         archivoManager = new ArchivoManager();
-        cargarDatos(); // Cargar datos al iniciar el programa
+        habitacionService = new HabitacionService();
+        habitaciones = habitacionService.generarHabitacionesIniciales(); // Cargar datos al iniciar el programa
 
-        // Creamos la vista principal y el controlador de reservas
         mainView = new MainView();
-        reservaController = new ReservaController();
 
-        // Asociamos la acción de los botones de la vista principal a los métodos del controlador
+        // Asociar acciones a los botones
         mainView.addRegistrarReservaListener(e -> abrirVistaReserva());
-        mainView.addMostrarHabitacionesListener(e -> {
-            try {
-                mostrarHabitaciones();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        mainView.addMostrarHabitacionesListener(e -> mostrarHabitaciones());
     }
 
-    // Inicia la vista principal
     public void iniciar() {
         mainView.setVisible(true);
     }
 
-    // Método para abrir la vista de reservas
-    public void abrirVistaReserva() {
-        reservaView.setVisible(true);
+    private void abrirVistaReserva() {
+        JOptionPane.showMessageDialog(mainView, "Funcionalidad de reserva no implementada.");
     }
 
-    // Método para mostrar todas las habitaciones (disponibles y reservadas)
-    public void mostrarHabitaciones() throws IOException {
-        // Asegurémonos de que las habitaciones están cargadas correctamente desde el archivo
-        habitaciones = archivoManager.cargarHabitaciones();
+    private void mostrarHabitaciones() {
+        try {
+            // Generar habitaciones aleatorias utilizando el servicio
+            List<Habitacion> habitaciones = habitacionService.generarHabitacionesIniciales();
 
-        StringBuilder sb = new StringBuilder("Listado de Habitaciones:\n");
-        for (Habitacion h : habitaciones) {
-            sb.append("Habitación: ").append(h.getNumero())
-                    .append(" - Estado: ").append(h.isEstaReservada() ? "Reservada" : "Disponible")
-                    .append("\n");
+            // Mostrar las habitaciones en la vista principal
+            mainView.mostrarHabitaciones(formatearListadoHabitaciones(habitaciones));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(mainView, "Error al mostrar las habitaciones: " + e.getMessage());
         }
-        mainView.mostrarHabitaciones(sb.toString());
     }
 
-    // Método para guardar los datos al cerrar el programa
-    public void guardarDatos() throws IOException {
-        archivoManager.guardarDatos(habitaciones, clientes, reservas);
-    }
-
-    // Método para cargar los datos al iniciar el programa
-    public void cargarDatos() throws IOException {
-        // Asegurémonos de que se carguen correctamente las habitaciones, clientes y reservas
-        habitaciones = archivoManager.cargarHabitaciones();
-        clientes = archivoManager.cargarClientes();
-        reservas = archivoManager.cargarReservas();
+    private String formatearListadoHabitaciones(List<Habitacion> habitaciones) {
+        StringBuilder sb = new StringBuilder();
+        for (Habitacion h : habitaciones) {
+            sb.append(h.toString()).append("\n");
+        }
+        return sb.toString();
     }
 }
+
 
 
 

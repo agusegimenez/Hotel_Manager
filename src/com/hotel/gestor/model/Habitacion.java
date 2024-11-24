@@ -61,7 +61,7 @@ public class Habitacion {
         this.precio = precio;
     }
 
-    public boolean isEstaReservada() { // Cambio el getter para seguir la convención booleana
+    public boolean isEstaReservada() {
         return estaReservada;
     }
 
@@ -77,7 +77,7 @@ public class Habitacion {
         this.cliente = cliente;
     }
 
-    public void cambiarEstado() { // Cambio para alternar entre reservado y disponible
+    public void cambiarEstado() {
         this.estaReservada = !this.estaReservada;
     }
 
@@ -87,59 +87,16 @@ public class Habitacion {
         return "Habitación " + numero + " - " + tipo + " (" + capacidad + " personas) - $" + precio + " - " + estado;
     }
 
-    public String toDataString() {
-        return id + "," + numero + "," + tipo + "," + capacidad + "," + precio + "," + estaReservada;
-    }
-
-    public static Habitacion fromDataString(String data) {
-        String[] parts = data.split(",");
-
-        // Verificar que la línea tiene 6 partes (como se espera)
-        if (parts.length != 6) {
-            System.err.println("Línea de datos no válida: " + data);
-            return null;  // Si la línea no tiene el formato adecuado, devolvemos null
-        }
-
-        int id = parseIntSafe(parts[0]);
-        int numero = parseIntSafe(parts[1]);
-        String tipo = parts[2].trim(); // Asegurarse de eliminar espacios innecesarios
-        int capacidad = parseIntSafe(parts[3]);
-        double precio = parseDoubleSafe(parts[4]);
-        boolean estaReservada = Boolean.parseBoolean(parts[5].trim());
-
-        return new Habitacion(id, numero, tipo, capacidad, precio, estaReservada);
-    }
-
-
-    // Método seguro para parsear enteros, que devuelve 0 en caso de que haya un error
-    private static int parseIntSafe(String value) {
-        try {
-            return Integer.parseInt(value.trim());
-        } catch (NumberFormatException e) {
-            return 0;  // Valor por defecto si no se puede parsear
-        }
-    }
-
-    // Método seguro para parsear dobles, que devuelve 0.0 en caso de que haya un error
-    private static double parseDoubleSafe(String value) {
-        try {
-            return Double.parseDouble(value.trim());
-        } catch (NumberFormatException e) {
-            return 0.0;  // Valor por defecto si no se puede parsear
-        }
-    }
-
-
-    // Método para obtener una habitación por su ID
     public static Habitacion obtenerHabitacionPorId(List<Habitacion> habitaciones, int id) {
         for (Habitacion habitacion : habitaciones) {
             if (habitacion.getId() == id) {
                 return habitacion;
             }
         }
-        return null; // Si no se encuentra la habitación, devolvemos null
+        return null;
     }
 }
+
 
 
 

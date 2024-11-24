@@ -54,5 +54,20 @@ public class HabitacionDAO {
         }
         return null;
     }
+
+
+    // Nuevo método: actualizar el estado de una habitación
+    public void actualizarHabitacion(Habitacion habitacion) {
+        HabitacionDAO habitacionDAO = new HabitacionDAO();
+        List<Habitacion> habitaciones = habitacionDAO.cargarHabitaciones();
+
+        for (Habitacion h : habitaciones) {
+            if (h.getId() == habitacion.getId()) {
+                h.setEstaReservada(habitacion.isEstaReservada());
+                break;
+            }
+        }
+        habitacionDAO.guardarHabitaciones(habitaciones);
+    }
 }
 

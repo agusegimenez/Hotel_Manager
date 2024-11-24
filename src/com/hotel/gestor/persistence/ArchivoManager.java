@@ -4,6 +4,7 @@ import com.hotel.gestor.controller.HabitacionFactory;
 import com.hotel.gestor.model.Cliente;
 import com.hotel.gestor.model.Habitacion;
 import com.hotel.gestor.model.Reserva;
+import com.hotel.gestor.service.HabitacionService;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,48 +15,49 @@ public class ArchivoManager {
     private static final String HABITACIONES_FILE = "habitaciones.txt";
     private static final String CLIENTES_FILE = "clientes.txt";
     private static final String RESERVAS_FILE = "reservas.txt";
+    private HabitacionService habitacionService;
 
-    // Guardar habitaciones en un archivo
-    public static void guardarHabitaciones(List<Habitacion> habitaciones) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(HABITACIONES_FILE))) {
-            for (Habitacion habitacion : habitaciones) {
-                writer.write(habitacion.toDataString());
-                writer.newLine();
-            }
-        }
-    }
+//    // Guardar habitaciones en un archivo
+//    public static void guardarHabitaciones(List<Habitacion> habitaciones) throws IOException {
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(HABITACIONES_FILE))) {
+//            for (Habitacion habitacion : habitaciones) {
+//                writer.write(habitacion.toDataString());
+//                writer.newLine();
+//            }
+//        }
+//    }
 
-    // Cargar habitaciones desde un archivo
-    public static List<Habitacion> cargarHabitaciones() throws IOException {
-        List<Habitacion> habitaciones = new ArrayList<>();
-        crearArchivoSiNoExiste(HABITACIONES_FILE);  // Crear archivo si no existe
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(HABITACIONES_FILE))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                // Ignorar líneas vacías
-                if (linea.trim().isEmpty()) {
-                    continue;
-                }
-
-                // Procesar la línea y crear la habitación
-                Habitacion habitacion = Habitacion.fromDataString(linea);
-                if (habitacion == null) {
-                    System.out.println("Línea de datos no válida: " + linea);
-                } else {
-                    habitaciones.add(habitacion);
-                }
-            }
-
-            // Si el archivo está vacío o no tiene datos válidos, generar habitaciones nuevas
-            if (habitaciones.isEmpty()) {
-                HabitacionFactory habitacionFactory = new HabitacionFactory();
-                habitacionFactory.generarHabitaciones();
-            }
-        }
-
-        return habitaciones;
-    }
+//    // Cargar habitaciones desde un archivo
+//    public static List<Habitacion> cargarHabitaciones() throws IOException {
+//        List<Habitacion> habitaciones = new ArrayList<>();
+//        crearArchivoSiNoExiste(HABITACIONES_FILE);  // Crear archivo si no existe
+//
+//        try (BufferedReader reader = new BufferedReader(new FileReader(HABITACIONES_FILE))) {
+//            String linea;
+//            while ((linea = reader.readLine()) != null) {
+//                // Ignorar líneas vacías
+//                if (linea.trim().isEmpty()) {
+//                    continue;
+//                }
+//
+//                // Procesar la línea y crear la habitación
+//                Habitacion habitacion = Habitacion.fromDataString(linea);
+//                if (habitacion == null) {
+//                    System.out.println("Línea de datos no válida: " + linea);
+//                } else {
+//                    habitaciones.add(habitacion);
+//                }
+//            }
+//
+//            // Si el archivo está vacío o no tiene datos válidos, generar habitaciones nuevas
+//            if (habitaciones.isEmpty()) {
+//                HabitacionFactory habitacionFactory = new HabitacionFactory();
+//                habitacionFactory.generarHabitaciones();
+//            }
+//        }
+//
+//        return habitaciones;
+//    }
 
 
     // Guardar clientes en un archivo
@@ -106,22 +108,22 @@ public class ArchivoManager {
 
     // Método para guardar los datos en archivos de texto (.txt)
     public void guardarDatos(List<Habitacion> habitaciones, List<Cliente> clientes, List<Reserva> reservas) throws IOException {
-        guardarHabitaciones(habitaciones);
+        habitacionService.guardarHabitaciones();
         guardarClientes(clientes);
         guardarReservas(reservas);
     }
-
-    // Método para cargar los datos desde archivos de texto (.txt)
-    public void cargarDatos() throws IOException {
-        // Cargar habitaciones
-        cargarHabitaciones();
-
-        // Cargar clientes
-        cargarClientes();
-
-        // Cargar reservas
-        cargarReservas();
-    }
+//
+//    // Método para cargar los datos desde archivos de texto (.txt)
+//    public void cargarDatos() throws IOException {
+//        // Cargar habitaciones
+//        cargarHabitaciones();
+//
+//        // Cargar clientes
+//        cargarClientes();
+//
+//        // Cargar reservas
+//        cargarReservas();
+//    }
 
     // Método para crear un archivo si no existe
     private static void crearArchivoSiNoExiste(String nombreArchivo) {

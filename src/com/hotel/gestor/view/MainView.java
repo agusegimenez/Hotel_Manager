@@ -3,6 +3,7 @@ package com.hotel.gestor.view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class MainView extends JFrame {
     private JButton btnReservarHabitacion;
@@ -31,6 +32,10 @@ public class MainView extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    public void mostrarHabitaciones(String habitaciones) {
+        areaHabitaciones.setText(habitaciones);
+    }
+
     public void addRegistrarReservaListener(ActionListener actionListener) {
         btnReservarHabitacion.addActionListener(actionListener);
     }
@@ -38,11 +43,9 @@ public class MainView extends JFrame {
     public void addMostrarHabitacionesListener(ActionListener actionListener) {
         btnVerHabitaciones.addActionListener(actionListener);
     }
-
-    public void mostrarHabitaciones(String habitaciones) {
-        areaHabitaciones.setText(habitaciones);
-    }
 }
+
+
 
 
 
